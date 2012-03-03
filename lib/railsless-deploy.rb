@@ -233,16 +233,19 @@ Capistrano::Configuration.instance(:must_exist).load do
       deploy, including `restart') or the 'update' task (which does everything \
       except `restart').
     DESC
+    
     task :symlink, :except => { :no_release => true } do
       on_rollback do
         if previous_release
           run "rm -f #{current_path}; ln -s #{previous_release} #{current_path}; true"
+          run "ln -nsf #{shared_path}/wp-config.php #{current_path}/wp-config.php; true"
         else
           logger.important "no previous release to rollback to, rollback of symlink skipped"
         end
       end
 
       run "rm -f #{current_path} && ln -s #{latest_release} #{current_path}"
+      run "ln -nsf #{shared_path}/wp-config.php #{current_path}/wp-config.php; true"
     end
 
     desc <<-DESC
